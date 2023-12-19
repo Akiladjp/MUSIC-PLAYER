@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <script src="https://kit.fontawesome.com/e0ca0da3d3.js" crossorigin="anonymous"></script>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: 'poppins';
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            background: #0a0059;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .music-player {
+            background: #0053b8;
+            width: 400px;
+            padding: 25px 35px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px 5px rgba(188, 253, 255, 0.499);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        nav .circle {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            background: #fff;
+            box-shadow: 0 5px 15px rgba(231, 251, 255, 0.22);
+        }
+
+        .music-player h1 {
+            color: #fff;
+            font-weight: 400;
+            font-size: 25px;
+            margin-top: 40px;
+        }
+
+        .music-player p {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        audio {
+            height: 40px;
+        }
+
+        #progress {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #fbfdff;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 40px 0;
+        }
+
+        #progress::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            background: #0800f2;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 8px solid #fff;
+            box-shadow: 0 5px 5px rgba(15, 195, 255, 0.22);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .controls div {
+            width: 60px;
+            height: 60px;
+            margin: 20px;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: #002872;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.84);
+            cursor: pointer;
+        }
+
+        .controls div:nth-child(2) {
+            transform: scale(1.4);
+            background-color: #002872;
+            box-shadow: 0 4px 10px rgba(33, 96, 255, 0.84);
+        }
+
+        .timer {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        #currentTime,
+        #totalDuration {
+            font-weight: bold;
+        }
+
+        #currentTime::after {
+            content: ' - ';
+            margin: 0 5px;
+        }
+
+        .song-img {
+            width: 220px;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.84);
+        }
+
+        .rotate {
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="music-player">
+            <nav>
+                <div class="circle">
+                    <i class="fa-solid fa-angle-left" style="color: #002872;"></i>
+                </div>
+                <div class="circle">
+                    <i class="fa-solid fa-bars" style="color: #002872;"></i>
+                </div>
+            </nav>
+            <img src="./thumbnail.jpg" class="song-img" alt="song-img">
+            <h1>Aradhana</h1>
+            <p>Daddy</p>
+
+            <audio id="song">
+                <source src="./Aradhana - Daddy.mp3" type="audio/mpeg">
+            </audio>
+
+            <input type="range" value="0" id="progress">
+
+            <div class="timer">
+                <span id="currentTime">0:00</span> <span id="totalDuration">0:00</span>
+            </div>
+
+            <div class="controls">
+                <div>
+                    <i class="fa-solid fa-backward" style="color: #002872;"></i>
+                </div>
+                <div onclick="playPause()">
+                    <i class="fa-solid fa-play" id="ctrlIcon" style="color: #e4edff;"></i>
+                </div>
+                <div>
+                    <i class="fa-solid fa-forward" style="color: #002872;"></i>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let progress = document.getElementById('progress');
+        let song = document.getElementById('song');
+        let ctrlIcon = document.getElementById('ctrlIcon');
+        let currentTimeDisplay = document.getElementById('currentTime');
+        let totalDurationDisplay = document.getElementById('totalDuration');
+        let songImage = document.querySelector('.song-img');
+
+        song.onloadedmetadata = function () {
+            progress.max = song.duration;
+            progress.value = song.currentTime;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            currentTimeDisplay.textContent = formatTime(song.currentTime);
+            totalDurationDisplay.textContent = formatTime(song.duration);
+        }
+
+        function playPause() {
+            if (ctrlIcon.classList.contains("fa-pause")) {
+                song.pause();
+                ctrlIcon.classList.remove("fa-pause");
+                ctrlIcon.classList.add("fa-play");
+                songImage.classList.remove("rotate");
+            } else {
+                song.play();
+                ctrlIcon.classList.add("fa-pause");
+                ctrlIcon.classList.remove("fa-play");
+                songImage.classList.add("rotate");
+            }
+        }
+
+        if (song.played) {
+            setInterval(() => {
+                progress.value = song.currentTime;
+                updateTimerDisplay();
+            }, 500);
+        }
+
+        progress.onchange = function () {
+            song.play();
+            song.currentTime = progress.value;
+            ctrlIcon.classList.add("fa-pause");
+            ctrlIcon.classList.remove("fa-play");
+            updateTimerDisplay();
+            songImage.classList.add("rotate");
+        }
+
+        song.onended = function () {
+            songImage.classList.remove("rotate");
+        }
+
+        function formatTime(time) {
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60);
+            return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+    </script>
+</body>
+
+</html>
